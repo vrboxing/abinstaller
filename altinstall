@@ -29,6 +29,7 @@ else
   echo "missing file: sharedfuncs"
   exit 1
 fi
+:' TESTING
 if ping -c 1 8.8.8.8 >/dev/null; then
     sudo -u ablive mkdir /home/ablive/src ; cd /home/ablive/src ; \
     wget https://github.com/ze-angry-wombat/archbang_custom/archive/master.zip ; \
@@ -71,7 +72,7 @@ if ping -c 1 8.8.8.8 >/dev/null; then
 else
     echo "No internet Connection"
 fi
-
+'
 LOG_ERR=/tmp/error_log
 touch $LOG_ERR
 WIKI="https://wiki.archlinux.org/index.php"
@@ -120,11 +121,10 @@ create_partition(){
   sudo gparted ${device}
 }
 #}}}
-#SELECT|FORMAT PARTITIONS {{{
-format_partitions(){
+#SELECT PARTITIONS {{{
+mount_partitions(){
   print_title "FILESYSTEMS - ${WIK}/File_Systems"
   print_info "This step will select and format the selected partiton where the archlinux will be installed"
-  print_danger "\tAll data on the ROOT and SWAP partition will be LOST."
   block_list=(`lsblk | grep 'part\|lvm' | awk '{print substr($1,3)}'`)
 
   # check if there is no partition
@@ -150,19 +150,6 @@ format_partitions(){
     partition_name=("root" "swap" "another")
   fi
 
-  select_filesystem(){
-    filesystems_list=( "btrfs" "ext2" "ext3" "ext4" "f2fs" "jfs" "nilfs2" "ntfs" "vfat" "xfs");
-    PS3="$prompt1"
-    echo -e "Select filesystem:\n"
-    select filesystem in "${filesystems_list[@]}"; do
-      if contains_element "${filesystem}" "${filesystems_list[@]}"; then
-        break
-      else
-        invalid_option
-      fi
-    done
-  }
-
   disable_partition(){
     #remove the selected partition from list
     unset partitions_list[${partition_number}]
@@ -172,15 +159,6 @@ format_partitions(){
   }
 
   format_partition(){
-    read_input_text "Confirm format $1 partition"
-    if [[ $OPTION == y ]]; then
-      [[ -z $3 ]] && select_filesystem || filesystem=$3
-      mkfs.${filesystem} $1 \
-        $([[ ${filesystem} == xfs || ${filesystem} == btrfs ]] && echo "-f") \
-        $([[ ${filesystem} == vfat ]] && echo "-F32") \
-        $([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard") \
-        $([[ $TRIM -eq 1 && ${filesystem} == btrfs ]] && echo "-O discard")
-      fsck $1
       mkdir -p $2
       mount -t ${filesystem} $1 $2
       disable_partition
@@ -330,10 +308,6 @@ install_archbang(){
     # Variables
     ACM="arch-chroot /mnt"
     ROOT_DEV=$(df | grep -w /mnt | awk {'print $1'})
-
-    # Update the complete system
-    # This keeps breaking the install removing for now
-    # sudo pacman -Syyuu
 
     # copy live iso environment to /mnt (new install device)
     echo "Copy live root image to /mnt "
