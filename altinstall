@@ -29,7 +29,6 @@ else
   echo "missing file: sharedfuncs"
   exit 1
 fi
-:' TESTING
 if ping -c 1 8.8.8.8 >/dev/null; then
     sudo -u ablive mkdir /home/ablive/src ; cd /home/ablive/src ; \
     wget https://github.com/ze-angry-wombat/archbang_custom/archive/master.zip ; \
@@ -72,7 +71,7 @@ if ping -c 1 8.8.8.8 >/dev/null; then
 else
     echo "No internet Connection"
 fi
-'
+
 LOG_ERR=/tmp/error_log
 touch $LOG_ERR
 WIKI="https://wiki.archlinux.org/index.php"
