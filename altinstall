@@ -67,8 +67,9 @@ if ping -c 1 8.8.8.8 >/dev/null; then
     cd /home/ablive/src ; \
     rm -rf yaourt-git ; \
     # Install Google, netcfg (replaces systemd netctl), yaourt-gui, kodi (media player), atom and composite manager
-    sudo -u ablive yaourt -S --noconfirm google-chrome-dev yaourt-gui kodi-platform atom-editor-bin cairo-compmgr
-    sudo -u ablive yaourt -S netctl-git
+    sudo -u ablive yaourt -S --noconfirm google-chrome-dev yaourt-gui kodi-platform \
+    atom-editor-bin cairo-compmgr auto-auto-complete texman tk gitg-git
+    sudo -u ablive yaourt -S netcfg-git
 else
     echo "No internet Connection"
 fi
@@ -177,15 +178,10 @@ format_partitions(){
   format_partition(){
     read_input_text "Confirm mount $1 partition"
     if [[ $OPTION == y ]]; then
-      [[ -z $3 ]] '&& select_filesystem || filesystem=$3
-      mkfs.${filesystem} $1 \
-        $([[ ${filesystem} == xfs || ${filesystem} == btrfs ]] && echo "-f") \
-        $([[ ${filesystem} == vfat ]] && echo "-F32") \
-        $([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard") \
-        $([[ $TRIM -eq 1 && ${filesystem} == btrfs ]] && echo "-O discard")'
+      [[ -z $3 ]]
       fsck $1
       mkdir -p $2
-      mount -t ${filesystem} $1 $2
+      mount $1 $2
       disable_partition
     fi
   }
@@ -288,18 +284,12 @@ format_partitions(){
             another)
               read -p "Mountpoint [ex: /home]:" directory
               [[ $directory == "/boot" ]] && BOOT_MNT=`echo ${partition} | sed 's/[0-9]//'`
-              select_filesystem
-              read_input_text "Format ${partition} partition"
-              if [[ $OPTION == y ]]; then
-                format_partition "${partition}" "${MNT}${directory}" "${filesystem}"
-              else
                 read_input_text "Confirm fs="${filesystem}" part="${partition}" dir="${directory}""
                 if [[ $OPTION == y ]]; then
                   mkdir -p ${MNT}${directory}
                   mount -t ${filesystem} ${partition} ${MNT}${directory}
                   check_mountpoint "${partition}" "${MNT}${directory}"
                 fi
-              fi
               ;;
           esac
           break
