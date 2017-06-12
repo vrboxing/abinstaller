@@ -68,7 +68,8 @@ if ping -c 1 8.8.8.8 >/dev/null; then
     rm -rf yaourt-git ; \
     # Install Google, netcfg (replaces systemd netctl), yaourt-gui, kodi (media player), atom and composite manager
     sudo -u ablive yaourt -S --noconfirm google-chrome-dev yaourt-gui kodi-platform \
-    atom-editor-bin cairo-compmgr auto-auto-complete texman tk gitg-git
+    atom-editor-bin cairo-compmgr auto-auto-complete texman tk gitg-git virtualbox-guest-modules-arch \
+    virtualbox-guest-utils-openrc virtualbox-guest-utils
     sudo -u ablive yaourt -S netcfg-git
 else
     echo "No internet Connection"
