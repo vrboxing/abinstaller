@@ -122,9 +122,12 @@ create_partition(){
 }
 #}}}
 #SELECT PARTITIONS {{{
-mount_partitions(){
+format_partitions(){
   print_title "FILESYSTEMS - ${WIK}/File_Systems"
   print_info "This step will select and format the selected partiton where the archlinux will be installed"
+  print_danger "\tAll data on the ROOT and SWAP partition will be LOST."
+  i=0
+
   block_list=(`lsblk | grep 'part\|lvm' | awk '{print substr($1,3)}'`)
 
   # check if there is no partition
@@ -150,6 +153,19 @@ mount_partitions(){
     partition_name=("root" "swap" "another")
   fi
 
+  select_filesystem(){
+    filesystems_list=( "btrfs" "ext2" "ext3" "ext4" "f2fs" "jfs" "nilfs2" "ntfs" "vfat" "xfs");
+    PS3="$prompt1"
+    echo -e "Select filesystem:\n"
+    select filesystem in "${filesystems_list[@]}"; do
+      if contains_element "${filesystem}" "${filesystems_list[@]}"; then
+        break
+      else
+        invalid_option
+      fi
+    done
+  }
+
   disable_partition(){
     #remove the selected partition from list
     unset partitions_list[${partition_number}]
@@ -158,11 +174,20 @@ mount_partitions(){
     [[ ${partition_name[i]} != another ]] && i=$(( i + 1 ))
   }
 
-  mount_partition(){
-      select partition in "${partitions_list[@]}"
+  format_partition(){
+    read_input_text "Confirm mount $1 partition"
+    if [[ $OPTION == y ]]; then
+      [[ -z $3 ]] '&& select_filesystem || filesystem=$3
+      mkfs.${filesystem} $1 \
+        $([[ ${filesystem} == xfs || ${filesystem} == btrfs ]] && echo "-f") \
+        $([[ ${filesystem} == vfat ]] && echo "-F32") \
+        $([[ $TRIM -eq 1 && ${filesystem} == ext4 ]] && echo "-E discard") \
+        $([[ $TRIM -eq 1 && ${filesystem} == btrfs ]] && echo "-O discard")'
+      fsck $1
       mkdir -p $2
       mount -t ${filesystem} $1 $2
       disable_partition
+    fi
   }
 
   format_swap_partition(){
@@ -604,7 +629,7 @@ do
     case "$OPT" in
       1)
         umount_partitions
-        create_partition
+        create_partition_scheme
         format_partitions
         checklist[1]=1
         ;;
