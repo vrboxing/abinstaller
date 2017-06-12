@@ -20,7 +20,7 @@
 # Modified for ArchBang OpenRC by Mr Green mrgreen(at)archbang(dot)org
 # Version 0.3 25-04-17
 
-# Modified for <Unnamed> OpenRC by Arrogantwombaticus arrogantwombaticus(at)gmail(dot)com
+# Modified for <Unnamed> OpenRC by Alexander Maikoda ze(dot)angry(dot)wombat(at)gmail(dot)com
 # Version 0.0.1 17-05-17
 
 if [[ -f /usr/bin/sharedfuncs ]]; then
@@ -602,16 +602,7 @@ check_boot_system
 while true
 do
   print_title "Custom ArchBang Installer - https://github.com/ze-angry-wombat/abinstaller/"
-  echo " a) $(mainmenu_item "${checklist[a]}" "Do Everything")"
-  echo " 1) $(mainmenu_item "${checklist[1]}" "Partition Scheme")"
-  echo " 2) $(mainmenu_item "${checklist[2]}" "Install OS")"
-  echo " 3) $(mainmenu_item "${checklist[3]}" "Hostname")"
-  echo " 4) $(mainmenu_item "${checklist[4]}" "Timezone")"
-  echo " 5) $(mainmenu_item "${checklist[5]}" "Locale")"
-  echo " 6) $(mainmenu_item "${checklist[6]}" "Desktop Keyboard Layout")"
-  echo " 7) $(mainmenu_item "${checklist[7]}" "Bootloader")"
-  echo " 8) $(mainmenu_item "${checklist[8]}" "Root Password")"
-  echo " 9) $(mainmenu_item "${checklist[9]}" "Create User")"
+  echo " a) $(mainmenu_item "${checklist[a]}" "Install Operating System")"
 
   echo ""
   echo " d) Done"
@@ -637,47 +628,6 @@ do
 	checklist[a]=1
 	finish
 	;;
-      1)
-        umount_partitions
-        create_partition
-        format_partitions
-        checklist[1]=1
-        ;;
-      2)
-        install_os
-	      configure_fstab
-        checklist[2]=1
-        ;;
-      3)
-        configure_hostname
-        checklist[3]=1
-        ;;
-      4)
-        configure_timezone
-        checklist[4]=1
-        ;;
-      5)
-        configure_locale
-	      configure_mkinitcpio
-        checklist[5]=1
-        ;;
-      6)
-	      select_xkeymap
-	      checklist[6]=1
-	      ;;
-      7)
-        install_bootloader
-        configure_bootloader
-        checklist[7]=1
-        ;;
-      8)
-        root_password
-        checklist[8]=1
-        ;;
-      9)
-        setup_user
-        checklist[9]=1
-        ;;
       "d")
         finish
         ;;
