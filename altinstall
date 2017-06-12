@@ -287,7 +287,7 @@ format_partitions(){
                 read_input_text "Confirm fs="${filesystem}" part="${partition}" dir="${directory}""
                 if [[ $OPTION == y ]]; then
                   mkdir -p ${MNT}${directory}
-                  mount -t ${filesystem} ${partition} ${MNT}${directory}
+                  mount ${partition} ${MNT}${directory}
                   check_mountpoint "${partition}" "${MNT}${directory}"
                 fi
               ;;
