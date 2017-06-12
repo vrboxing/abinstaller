@@ -38,7 +38,6 @@ if ping -c 1 8.8.8.8 >/dev/null; then
     sudo cp -rf archbang_custom-master/mirrorlist /etc/pacman.d/.
     sudo cp -rf archbang_custom-master/autostart /home/ablive/.config/openbox/.
     sudo cp -rf archbang_custom-master/menu.xml /home/ablive/.config/openbox/.
-    sudo cp -rf archbang_custom-master/bash_profile /home/ablive/.bash_profile
     sudo mv /home/ablive/Backgrounds /home/ablive/.config/backgrounds
     sudo pacman -Sy --needed --noconfirm nilfs-utils
 
