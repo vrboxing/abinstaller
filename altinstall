@@ -310,7 +310,7 @@ format_partitions(){
 }
 #}}}
 # Fast-Install {{{
-install_archbang(){
+install_os(){
     # Device mounted?
     if ! mountpoint -q /mnt; then
         echo "Make sure target device is mounted..."
@@ -371,7 +371,7 @@ configure_fstab(){
 configure_hostname(){
   print_title "HOSTNAME - ${WIKI}/hostname"
   print_info "A host name is a unique name created to identify a machine on a network. Length is restricted to 63 characters."
-  read -p "Hostname [ex: archbang]: " host_name
+  read -p "Hostname [ex: bangersnmash]: " host_name
   sed -i "s/archbang/${host_name}/g" ${MNT}/etc/conf.d/hostname
 # echo "$host_name" > ${MNT}/etc/hostname
   arch_chroot "sed -i '/127.0.0.1/s/$/ '${host_name}'/' /etc/hosts"
@@ -583,7 +583,7 @@ setup_user(){
 #}}}
 #FINISH {{{
 finish(){
-  print_title "ARCHBANG INSTALL COMPLETED..."
+  print_title "OS INSTALL COMPLETED..."
   read_input_text "Reboot system"
   if [[ $OPTION == y ]]; then
     umount_partitions
@@ -593,16 +593,17 @@ finish(){
 }
 #}}}
 
-#print_title "ArchBang installer"
-#print_info "abinstall is an menu driven installer."
+#print_title "Custom ArchBang Installer"
+#print_info "altinstall is an menu driven installer."
 #pause_function
 check_boot_system
 
 while true
 do
-  print_title "ArchBang installer - www.archbang.org"
+  print_title "Custom ArchBang Installer - https://github.com/ze-angry-wombat/abinstaller/"
+  echo " a) $(mainmenu_item "${checklist[a]}" "Do Everything")"
   echo " 1) $(mainmenu_item "${checklist[1]}" "Partition Scheme")"
-  echo " 2) $(mainmenu_item "${checklist[2]}" "Install ArchBang")"
+  echo " 2) $(mainmenu_item "${checklist[2]}" "Install OS")"
   echo " 3) $(mainmenu_item "${checklist[3]}" "Hostname")"
   echo " 4) $(mainmenu_item "${checklist[4]}" "Timezone")"
   echo " 5) $(mainmenu_item "${checklist[5]}" "Locale")"
@@ -617,14 +618,32 @@ do
   read_input_options
   for OPT in ${OPTIONS[@]}; do
     case "$OPT" in
+      "a")
+        umount_partitions
+	create_partition
+	format_partitions
+	install_os
+		configure_fstab
+	configure_hostname
+	configure_timezone
+	configure_locale
+		configure_mkinitcpio
+	select_xkeymap
+	install_bootloader
+	configure_bootloader
+	root_password
+	setup_user
+	checklist[a]=1
+	finish
+	;;
       1)
         umount_partitions
-        create_partition_scheme
+        create_partition
         format_partitions
         checklist[1]=1
         ;;
       2)
-        install_archbang
+        install_os
 	      configure_fstab
         checklist[2]=1
         ;;
