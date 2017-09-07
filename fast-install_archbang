@@ -44,5 +44,8 @@ echo "Clean new install..."
 rm /mnt/etc/mkinitcpio-archiso.conf
 rm -r /mnt/etc/initcpio
 
+arch-chroot /mnt "grub-install --target=i386-pc /dev/sda"
+arch-chroot /mnt "grub-mkconfig -o /boot/grub/grub.cfg"
+
 echo "::Install complete::"
 
